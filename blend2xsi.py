@@ -89,11 +89,6 @@ class XSI(_FrameContainer):
 		if filepath:
 			self.read(filepath)
 	
-	def read(self, filepath, re_skip=None):
-		with open(filepath, "r") as f:
-			self.name = filepath
-			Reader(f, bz2xsi_xsi=self, re_skip=re_skip, log_name=self.name)
-	
 	def write(self, filepath):
 		with open(filepath, "w") as f:
 			Writer(self, f)
@@ -455,7 +450,7 @@ class Writer:
 		for root_frame in self.xsi.frames:
 			print("Writing object data...")
 			
-			self.write()			
+			self.write()
 			self.write_frame(0, root_frame)
 		
 		animated_frames = tuple(self.xsi.get_animated_frames())
@@ -592,19 +587,10 @@ class Writer:
 			self.write(t + 1, "}")
 		
 		self.write(t, "}")
-		
+	
 	def write_envelope(self, t, frame, envelope):
 		self.write(t, "SI_Envelope {")
 		self.write(t + 1, "\"frm-%s\";" % self.get_safe_name(frame.name))
 		self.write(t + 1, "\"frm-%s\";" % self.get_safe_name(envelope.bone.name))
 		self.write_vector_list(t + 1, "%d;%f;", envelope.vertices)
 		self.write(t, "}")
-
-def read(filepath, regex_skip_types=None):
-	with open(filepath, "r") as f:
-		if regex_skip_types == None:
-			reader = Reader(f, bz2xsi_xsi=None, log_name=filepath) # Use defaults
-		else:
-			reader = Reader(f, bz2xsi_xsi=None, log_name=filepath, re_skip=regex_skip_types)
-		
-		return reader.xsi
