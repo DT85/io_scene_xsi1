@@ -1,10 +1,10 @@
 bl_info = {
 	"name": "Softimage XSI 1.0 format",
-	"author": "FruteSoftware@gmail.com, Tempust85",
+	"author": "Tempust85",
 	"version": (1, 0, 0),
 	"blender": (4, 2, 0),
 	"location": "File > Import-Export",
-	"description": "Softimage XSI 1.0 Exporter. Based off of 'FruteSoftware@gmail.com' BZ2 XSI Exporter",
+	"description": "Softimage XSI 1.0 Exporter. Based off of BZ2 XSI Exporter by frute94",
 	"category": "Import-Export"
 }
 
