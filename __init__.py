@@ -31,7 +31,7 @@ if "bpy" in locals():
 class ExportXSI(bpy.types.Operator, ExportHelper):
 	"""Export Softimage XSI 1.0 file"""
 	bl_idname = "export_scene.blend2xsi"
-	bl_label = "Export XSI"
+	bl_label = "Export XSI 1.0"
 	bl_options = {"UNDO", "PRESET"}
 	
 	directory: StringProperty(subtype="DIR_PATH")
