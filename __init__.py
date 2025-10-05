@@ -190,15 +190,21 @@ class ExportXSI(bpy.types.Operator, ExportHelper):
 def menu_func_export(self, context):
 	self.layout.operator(ExportXSI.bl_idname, text="Softimage XSI 1.0 (.xsi)")
 
-def register():
-	bpy.utils.register_class(ExportXSI)
+classes = (
+	ExportXSI,
+)
 
+def register():
+	for cls in classes:
+		bpy.utils.register_class(cls)
+	
 	bpy.types.TOPBAR_MT_file_export.append(menu_func_export)
 
 def unregister():
 	bpy.types.TOPBAR_MT_file_export.remove(menu_func_export)
-
-	bpy.utils.unregister_class(ExportXSI)
+	
+	for cls in classes:
+		bpy.utils.unregister_class(cls)
 
 if __name__ == "__main__":
 	register()
