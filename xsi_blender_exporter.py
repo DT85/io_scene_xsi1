@@ -317,21 +317,29 @@ class Save:
 		if is_root_level and self.opt["zero_root_transforms"]:
 			bz2frame.transform = self.matrix_to_bz2matrix(Matrix.Identity(4))
 		else:
-			mat_transform = Matrix(obj.matrix_local)
-			
-			if self.opt["export_jedi"]:
-				# change the 'front' from Y+ to X+
-				self.bone_mat_front_Y_to_X(mat_transform)
-			
-			if obj.parent:
-				mat_transform_parent = Matrix(obj.parent.matrix_local)
+			if obj.parent is not None:
+				matrix_local_parent = Matrix()
+				matrix_local_parent @= Matrix(obj.parent.matrix_local)
+				
+				matrix_local = Matrix()
+				matrix_local @= Matrix(obj.matrix_local)
 				
 				if self.opt["export_jedi"]:
 					# change the 'front' from Y+ to X+
-					self.bone_mat_front_Y_to_X(mat_transform_parent)
+					self.bone_mat_front_Y_to_X(matrix_local_parent)
+					self.bone_mat_front_Y_to_X(matrix_local)
+                    
+				mat_transform = matrix_local_parent.inverted() @ matrix_local
+			else:
+				matrix_local = Matrix()
+				matrix_local @= Matrix(bone.matrix_local)
 				
-				mat_transform = mat_transform_parent.inverted_safe() @ mat_transform
-			
+				if self.opt["export_jedi"]:
+					# change the 'front' from Y+ to X+
+					self.bone_mat_front_Y_to_X(matrix_local)
+				
+				mat_transform = matrix_local
+                
 			if self.opt["export_jedi"]:
 				# zero out the matrix for the 'mesh_root' / 'skeleton_root' objects
 				if obj.name == "mesh_root" or obj.name == "skeleton_root":
@@ -340,19 +348,13 @@ class Save:
 					# convert the matrix to 'xsi style'
 					self.matrix_to_xsi(mat_transform)
 					
-					# send the matrix to 'blend2xsi.py' for writing...
+					# send the matrix to 'bz2xsi.py' for writing...
 					bz2frame.transform = self.matrix_to_bz2matrix(mat_transform)
 			else:
-				bz2frame.transform = self.matrix_to_bz2matrix(obj.matrix_local)
-			
+				bz2frame.transform = self.matrix_to_bz2matrix(mat_transform)
+		
 		if is_skinned:
-			mat_transform2 = Matrix(obj.matrix_local)
-			
-			if self.opt["export_jedi"]:
-				# change the 'front' from Y+ to X+
-				self.bone_mat_front_Y_to_X(mat_transform2)
-			
-			# send the matrix to 'blend2xsi.py' for writing...
+			# just a copy of the 'FrameTransformMatrix'. send the matrix to 'bz2xsi.py' for writing...
 			bz2frame.pose = bz2frame.transform
 		
 		obj_eval = obj.evaluated_get(self.depsgraph)
