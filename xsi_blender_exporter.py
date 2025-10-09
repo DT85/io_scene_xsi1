@@ -355,6 +355,9 @@ class Save:
 					# send the matrix to 'bz2xsi.py' for writing...
 					bz2frame.transform = self.matrix_to_bz2matrix(mat_transform)
 			else:
+				# convert the matrix to 'xsi style'
+				self.matrix_to_xsi(mat_transform)
+				
 				bz2frame.transform = self.matrix_to_bz2matrix(mat_transform)
 		
 		if is_skinned:
@@ -436,9 +439,8 @@ class Save:
                 
 				mat_obj = Matrix(obj.matrix_local)
 				
-				if self.opt["export_jedi"]:
-					# convert the matrix to 'xsi style'
-					self.matrix_to_xsi(mat_obj)
+				# convert the matrix to 'xsi style'
+				self.matrix_to_xsi(mat_obj)
 				
 				# send the keys to 'blend2xsi.py' for writing...
 				if bz2_keyframe_type == 0:
@@ -504,29 +506,24 @@ class Save:
 			#print("Matrix, relative to armature object -")
 			#
 			
-		if self.opt["export_jedi"]:
-            # convert the matrix to 'xsi style'
-			self.matrix_to_xsi(mat_transform)
-			
-			# send the matrix to 'bz2xsi.py' for writing...
-			bz2frame.transform = self.matrix_to_bz2matrix(mat_transform)
-			
-			# DEBUGGING ONLY
-			#mat_debug = Matrix(mat_transform)
-			#print(mat_debug.transposed())
-			#print("\n")
-			
-			#sca = Vector(mat_transform.to_scale())            
-			#print("Scale: \nX = %.8f \nY = %.8f \nZ = %.8f \n" % (sca.x, sca.y, sca.z))
-			
-			#deg = Vector([degrees(n) for n in mat_transform.to_euler()])
-			#print("Rotation (Euler Degrees): \nX = %.8f \nY = %.8f \nZ = %.8f \n" % (deg.x, deg.y, deg.z))
-			
-			#pos = Vector(mat_transform.to_translation())
-			#print("Position: \nX = %.8f \nY = %.8f \nZ = %.8f \n" % (pos.x, pos.y, pos.z))
-			#            
-		else:
-			bz2frame.transform = self.matrix_to_bz2matrix(mat_transform)
+		# DEBUGGING ONLY
+		#mat_debug = Matrix(mat_transform)
+		#print(mat_debug.transposed())
+		#print("\n")
+		
+		#sca = Vector(mat_transform.to_scale())            
+		#print("Scale: \nX = %.8f \nY = %.8f \nZ = %.8f \n" % (sca.x, sca.y, sca.z))
+		
+		#deg = Vector([degrees(n) for n in mat_transform.to_euler()])
+		#print("Rotation (Euler Degrees): \nX = %.8f \nY = %.8f \nZ = %.8f \n" % (deg.x, deg.y, deg.z))
+		
+		#pos = Vector(mat_transform.to_translation())
+		#print("Position: \nX = %.8f \nY = %.8f \nZ = %.8f \n" % (pos.x, pos.y, pos.z))
+		
+		# convert the matrix to 'xsi style'
+		self.matrix_to_xsi(mat_transform)
+		
+		bz2frame.transform = self.matrix_to_bz2matrix(mat_transform)
 		
 		# SI_FrameBasePoseMatrix
         # just a copy of the 'FrameTransformMatrix'. send the matrix to 'bz2xsi.py' for writing...
@@ -603,9 +600,8 @@ class Save:
 					
 					mat_posebone = matrix_local
 				
-				if self.opt["export_jedi"]:
-					# convert the matrix to 'xsi style'
-					self.matrix_to_xsi(mat_posebone)
+				# convert the matrix to 'xsi style'
+				self.matrix_to_xsi(mat_posebone)
 				
 				# send the keys to 'blend2xsi.py' for writing...
 				if bz2_keyframe_type == 0:
@@ -634,11 +630,10 @@ class Save:
 				bz2materials += [self.material_to_bz2material(material)]
 		
 		for vertex in data.vertices:
-			if self.opt["export_jedi"]:
-                # change the vertex positions to 'xsi style'
-				vert_Y = vertex.co.y * -1
-				vertex.co.y = vertex.co.z
-				vertex.co.z = vert_Y
+			# change the vertex positions to 'xsi style'
+			vert_Y = vertex.co.y * -1
+			vertex.co.y = vertex.co.z
+			vertex.co.z = vert_Y
 			
 			bz2mesh.vertices += [tuple(vertex.co.xyz)]				
                 
