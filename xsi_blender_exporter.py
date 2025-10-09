@@ -253,16 +253,20 @@ class Save:
 			else:
 				mat[key] = default
 		
-		# Use the first texture in the node tree if applicable.
-		if material.use_nodes and not mat["texture"]:
-			for node in material.node_tree.nodes:
-				if node.type == "TEX_IMAGE":
-                    # use a relative path
-					rel_path = str(node.image.filepath)
-					rel_path = rel_path.lstrip().split('base\\')[1]
-					
-					mat["texture"] = rel_path
-					break # Found an image texture.
+		if self.opt["export_jedi"]:
+            # Use the material name
+			mat["texture"] = str(material.name)
+		else:
+			# Use the first texture in the node tree if applicable.
+			if material.use_nodes and not mat["texture"]:
+				for node in material.node_tree.nodes:
+					if node.type == "TEX_IMAGE":
+						#mat["texture"] = str(node.image.filepath)
+						# We want the filename + extension only
+						path = str(node.image.filepath)
+						filename = bpy.path.basename(path)
+						mat["texture"] = filename						
+						break # Found an image texture.
 		
 		return blend2xsi.Material(
 			mat["diffuse"],
