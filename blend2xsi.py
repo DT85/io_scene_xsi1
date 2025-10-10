@@ -11,6 +11,9 @@ DEFAULT_AMBIENT = (0.5, 0.5, 0.5)
 DEFAULT_HARDNESS = 200.0
 DEFAULT_SHADING_TYPE = 2
 DEFAULT_TEXTURE = None
+DEFAULT_WIDTH = 0
+DEFAULT_HEIGHT = 0
+DEFAULT_MATERIAL_NAME = None
 
 DEFAULT_XSI_NAME = "<XSI ROOT>"
 
@@ -264,7 +267,7 @@ class Material:
 	def __init__(self,
 				diffuse=None, hardness=DEFAULT_HARDNESS, specular=None,
 				ambient=None, emissive=None, shading_type=DEFAULT_SHADING_TYPE,
-				texture=None
+				texture=None, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT, material_name=None
 			):
 		self.diffuse  = diffuse  if diffuse  else list(DEFAULT_DIFFUSE)
 		self.specular = specular if specular else list(DEFAULT_SPECULAR)
@@ -274,6 +277,9 @@ class Material:
 		self.hardness = hardness
 		self.shading_type = shading_type
 		self.texture = texture
+		self.width = width
+		self.height = height
+		self.material_name = material_name
 		
 		if len(self.diffuse) == 3:
 			self.diffuse += (1.0,) # Append alpha channel
@@ -291,11 +297,14 @@ class Material:
 			raise TypeError("Material Ambient color must be RGB.")
 	
 	def __str__(self):
-		return "<Material>%r (%f, %f, %f, %f)</Material>" % (str(self.texture), *self.diffuse)
+		return "<Material>%r %r (%f, %f, %f, %f)</Material>" % (str(self.material_name), str(self.texture), *self.diffuse)
 	
 	def __eq__(self, other):
 		return (
 			self.texture == other.texture
+			and self.width == other.width
+			and self.height == other.height
+			and self.material_name == other.material_name
 			and self.diffuse      == other.diffuse
 			and self.hardness     == other.hardness
 			and self.specular     == other.specular
@@ -571,7 +580,39 @@ class Writer:
 		
 		if material.texture:
 			self.write(t + 1, "SI_Texture2D {")
-			self.write(t + 2, "\"%s\";" % material.texture)
+			self.write(t + 2, "\"%s\";" % material.texture) # texture filename + ext
+			self.write(t + 2, "3;") # mapping type. 3 = UV map (unwrapped)
+			self.write(t + 2, "%i;" % material.width) # texture width
+			self.write(t + 2, "%i;" % material.height) # texture height
+			
+			if material.width == 0 and material.height == 0:
+				self.write(t + 2, "0;0;0;0;") # cropUMin, cropUMax, cropVMin, cropVMax
+			else:                
+				crop = [material.width - 1, material.height - 1]
+				self.write(t + 2, "0;%i;0;%i;" % tuple(crop)) # cropUMin, cropUMax, cropVMin, cropVMax 
+			
+			self.write(t + 2, "0;") # if U and V orientations are swapped. 0 = false
+			self.write(t + 2, "1;1;") # whether to mirror texture horizontally (U) 
+			self.write(t + 2, "0;0;") # whether to mirror texture vertically (V) 
+			self.write(t + 2, "1.000000;1.000000;") # U scale, V scale
+			self.write(t + 2, "0.000000;0.000000;") # U offset, V offset
+			self.write(t + 2, "1.000000,0.000000,0.000000,0.000000,") # Project matrix
+			self.write(t + 2, "0.000000,1.000000,0.000000,0.000000,")
+			self.write(t + 2, "0.000000,0.000000,1.000000,0.000000,")
+			self.write(t + 2, "0.000000,0.000000,0.000000,1.000000;;")
+			self.write(t + 2, "3;") # blend type between texture and material attribs. 3 = No mask
+			self.write(t + 2, "1.000000;") # Blending value. Normalized contribution of texture attribs (below)
+			self.write(t + 2, "0.750000;") # Texture ambient
+			self.write(t + 2, "1.000000;") # Texture diffuse
+			self.write(t + 2, "0.000000;") # Texture specular
+			self.write(t + 2, "0.000000;") # Texture transparency
+			self.write(t + 2, "0.000000;") # Texture reflectivity
+			self.write(t + 2, "0.000000;") # Texture roughness
+			self.write(t + 1, "}")
+        
+		if material.material_name:
+			self.write(t + 1, "SI_ElementUserData_SHADER {")
+			self.write(t + 2, "\"%s\";" % material.material_name)
 			self.write(t + 1, "}")
 		
 		self.write(t, "}")

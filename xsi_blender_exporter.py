@@ -23,7 +23,10 @@ DEFAULT_MATERIAL = {
 	"ambient": (blend2xsi.DEFAULT_AMBIENT, tuple),
 	"emissive": (blend2xsi.DEFAULT_EMISSIVE, tuple),
 	"shading_type": (blend2xsi.DEFAULT_SHADING_TYPE, int),
-	"texture": (None, str)
+	"texture": (blend2xsi.DEFAULT_TEXTURE, str),
+	"width": (blend2xsi.DEFAULT_WIDTH, int),
+	"height": (blend2xsi.DEFAULT_HEIGHT, int),
+	"material_name": (blend2xsi.DEFAULT_MATERIAL_NAME, str)
 }
 
 def center_mouse_in_region():
@@ -255,18 +258,21 @@ class Save:
 		
 		if self.opt["export_jedi"]:
             # Use the material name
-			mat["texture"] = str(material.name)
-		else:
-			# Use the first texture in the node tree if applicable.
-			if material.use_nodes and not mat["texture"]:
-				for node in material.node_tree.nodes:
-					if node.type == "TEX_IMAGE":
-						#mat["texture"] = str(node.image.filepath)
-						# We want the filename + extension only
-						path = str(node.image.filepath)
-						filename = bpy.path.basename(path)
-						mat["texture"] = filename						
-						break # Found an image texture.
+			mat["material_name"] = str(material.name)
+
+		# Use the first texture in the node tree if applicable.
+		if material.use_nodes and not mat["texture"]:
+			for node in material.node_tree.nodes:
+				if node.type == "TEX_IMAGE":
+					# We want the filename + extension only
+					path = str(node.image.filepath)
+					filename = bpy.path.basename(path)
+					mat["texture"] = filename
+					mat["width"] = node.image.size[0]
+					mat["height"] = node.image.size[1]
+					break # Found an image texture.
+				else:
+					mat["texture"] = "noPic.pic"
 		
 		return blend2xsi.Material(
 			mat["diffuse"],
@@ -275,7 +281,10 @@ class Save:
 			mat["ambient"],
 			mat["emissive"],
 			mat["shading_type"],
-			mat["texture"]
+			mat["texture"],
+			mat["width"],
+			mat["height"],
+			mat["material_name"]
 		)
 
 	def matrix_to_bz2matrix(self, local_matrix):
