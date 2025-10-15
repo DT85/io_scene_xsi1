@@ -345,14 +345,14 @@ class Save:
 				mat_transform = matrix_local_parent.inverted() @ matrix_local
 			else:
 				matrix_local = Matrix()
-				matrix_local @= Matrix(bone.matrix_local)
+				matrix_local @= Matrix(obj.matrix_local)
 				
 				if self.opt["export_jedi"]:
 					# change the 'front' from Y+ to X+
 					self.bone_mat_front_Y_to_X(matrix_local)
 				
 				mat_transform = matrix_local
-                
+			
 			if self.opt["export_jedi"]:
 				# zero out the matrix for the 'mesh_root' / 'skeleton_root' objects
 				if obj.name == "mesh_root" or obj.name == "skeleton_root":
@@ -379,7 +379,7 @@ class Save:
 		scale = obj_eval.matrix_local.to_scale()
 		
 		if scale != Vector((1.0, 1.0, 1.0)):
-			print("XSI WARNING: The scale for object %r = %r, which isn't supported by BattleZone II/Jedi Outcast/Jedi Academy. Ensure all objects have the scale of 1.0 on all axis." % (obj.name, scale))
+			print("XSI WARNING: The scale for object %r = %r, which isn't supported by Jedi Outcast/Jedi Academy. Ensure all objects have the scale of 1.0 on all axis." % (obj.name, scale))
 		
 		if obj.type == "MESH" and not len(data.vertices) <= 0:
 			if not ALLOW_MESH_WITH_NO_FACES and len(data.polygons) <= 0:
@@ -390,6 +390,10 @@ class Save:
 					bz2frame.mesh = self.mesh_to_bz2mesh(data, bz2frame.name if USE_FRAME_NAME_AS_MESH_NAME else None)
 					
 					if is_skinned:
+						# switch to armature REST position
+						armature_obj = get_armature(obj)
+						armature_obj.data.pose_position = 'REST'
+						
                         # ensure the we're setting the skin weights at frame 0.
 						bpy.context.scene.frame_set(bpy.context.scene.frame_start)
 						
@@ -413,7 +417,7 @@ class Save:
 			
 			if bz2_animations:
 				if is_root_level:
-					print("XSI WARNING: Root-level object %r has animation data, and may not behave as expected in BattleZone II/Jedi Outcast/Jedi Academy." % obj.name)
+					print("XSI WARNING: Root-level object %r has animation data, and may not behave as expected in Jedi Outcast/Jedi Academy." % obj.name)
 				
 				bz2frame.animation_keys += list(self.animation_to_bz2anim(obj_eval))
 		
@@ -470,12 +474,6 @@ class Save:
 		
         # FrameTransformMatrix.
 		# root bones are in world co-ordinates, and the child bones are relative to the parent
-        
-		# DEBUGGING ONLY
-		#print("****************************************\n")
-		#print("Bone: \"%s\" \n" % bone.name)
-		#
-		
 		if bone.parent is not None:
 			matrix_local_parent = Matrix()
 			matrix_local_parent @= Matrix(bone.parent.matrix_local)
@@ -497,9 +495,6 @@ class Save:
 					# change the scale for the child bones of 'face'
 					mat_transform @= Matrix.Scale(1.087000, 4)
 			
-            # DEBUGGING ONLY
-			#print("Matrix, relative to bone parent -")
-            #
 		else:
 			matrix_local = Matrix()
 			matrix_local @= Matrix(bone.matrix_local)
@@ -510,25 +505,6 @@ class Save:
 			
 			mat_transform = matrix_local
 			
-			# DEBUGGING ONLY
-			#print("|> ROOT BONE <| \n")
-			#print("Matrix, relative to armature object -")
-			#
-			
-		# DEBUGGING ONLY
-		#mat_debug = Matrix(mat_transform)
-		#print(mat_debug.transposed())
-		#print("\n")
-		
-		#sca = Vector(mat_transform.to_scale())            
-		#print("Scale: \nX = %.8f \nY = %.8f \nZ = %.8f \n" % (sca.x, sca.y, sca.z))
-		
-		#deg = Vector([degrees(n) for n in mat_transform.to_euler()])
-		#print("Rotation (Euler Degrees): \nX = %.8f \nY = %.8f \nZ = %.8f \n" % (deg.x, deg.y, deg.z))
-		
-		#pos = Vector(mat_transform.to_translation())
-		#print("Position: \nX = %.8f \nY = %.8f \nZ = %.8f \n" % (pos.x, pos.y, pos.z))
-		
 		# convert the matrix to 'xsi style'
 		self.matrix_to_xsi(mat_transform)
 		
@@ -547,6 +523,9 @@ class Save:
 		
 		if self.opt["export_animations"]:
 			if armature.animation_data and armature.animation_data.action:
+				# Switch to armature POSE position
+				armature.data.pose_position = 'POSE'
+				
 				bz2frame.animation_keys += list(self.bone_animation_to_bz2anim(bone, posebone, armature))
 		
 		return bz2frame
