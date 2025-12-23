@@ -4,9 +4,7 @@
 
 To use, create a folder called "io_scene_xsi1" in your blender addons folder.
 Extract the files into the new folder, open blender, and activate the addon in preferences.
-Search for "Softimage XSI 1.0 Format" in addons.
-
-The menu options under file -> import and file -> export will then be available.
+Look for "Softimage XSI 1.0 Export" in addons.
 
 --------------------------------
 
