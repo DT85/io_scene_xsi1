@@ -26,25 +26,25 @@ DEFAULT_MATERIAL = {
 	"material_name": (blend2xsi.DEFAULT_MATERIAL_NAME, str)
 }
 
-def center_mouse_in_region():
+def center_mouse_in_window():
 	region = bpy.context.region
 	
 	window_cx = bpy.context.window.width // 2 + bpy.context.window.x
 	window_cy = bpy.context.window.height // 2 + bpy.context.window.y
 	
-	bpy.context.window.cursor_warp(window_cx, window_cy)
+	return bpy.context.window.cursor_warp(window_cx, window_cy)
 
-def ShowMessageBox(message="", icon='INFO'):
-	center_mouse_in_region()
+def ShowMessageBox(title_text="", message_text="", icon='INFO'):
+	center_mouse_in_window()
 	
 	def draw(self, context):
 		self.layout.separator()
 		self.layout.alignment = 'CENTER'
 		self.layout.label(text="")
-		self.layout.label(text=message, icon=icon)
+		self.layout.label(text=message_text, icon=icon)
 		self.layout.separator()
 	
-	bpy.context.window_manager.popup_menu(draw, title="Softimage XSI Exporter")
+	return bpy.context.window_manager.popup_menu(draw, title=title_text)
 
 # Mesh for hardpoint objects
 def generate_pointer_mesh(scale=0.05):
@@ -662,5 +662,5 @@ class Save:
 
 def save(operator, context, filepath="", **opt):
 	Save(operator, context, filepath=filepath, **opt).blend2xsi_xsi.write(filepath=filepath)
-	ShowMessageBox("Exported successfully!", 'CHECKMARK')
+	ShowMessageBox("Softimage XSI Exporter", "Exported successfully!", 'CHECKMARK')
 	return {"FINISHED"}
