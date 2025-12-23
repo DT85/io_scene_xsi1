@@ -5,9 +5,6 @@ from decimal import *
 
 from . import blend2xsi
 
-# Normals changed in 4.1 from 4.0
-OLD_NORMALS = not (bpy.app.version[0] >= 4 and bpy.app.version[1] >= 1)
-
 USE_FRAME_NAME_AS_MESH_NAME = True
 ALLOW_MESH_WITH_NO_FACES = False
 ALLOW_MESH_WITH_NO_MATERIAL = False
@@ -144,7 +141,7 @@ def get_keyframes_filtered(action, keyframe_filter):
 	filtered_points = {key: [] for key in keyframe_filter}
 	key_start, key_end = tuple(action.frame_range)
 	
-	for fcurve in action.fcurves:
+	for fcurve in action.layers['Legacy Layer'].strips[0].channelbags[0].fcurves:
 		if not fcurve.data_path in keyframe_filter:
 			continue
 		
@@ -607,9 +604,6 @@ class Save:
 	
 	def mesh_to_bz2mesh(self, data, name=None):
 		bz2mesh = blend2xsi.Mesh(name if name else data.name)
-		
-		if OLD_NORMALS:
-			data.calc_normals_split()
 		
 		bz2materials = []
 		
