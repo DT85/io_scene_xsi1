@@ -1,4 +1,4 @@
-"""This module provides Blender to XSI utilities, including a writer for XSI 1.0 files."""
+"""This module provides a Blender to XSI writer for XSI 1.0 files."""
 VERSION = 1.0
 
 # No print calls will be made by the module if this is False
@@ -358,8 +358,8 @@ class Envelope:
 class XSIParseError(Exception): pass
 
 class Writer:
-	def __init__(self, blend2xsi_xsi, f):
-		self.xsi = blend2xsi_xsi
+	def __init__(self, xsi_xsi, f):
+		self.xsi = xsi_xsi
 		self.file = f
 		
 		if f:
@@ -528,6 +528,7 @@ class Writer:
 				self.write(t + 1, "MeshMaterialList {")
 				self.write(t + 2, "%d;" % len(materials))
 				self.write(t + 2, "%d;" % len(face_material_indices))
+				
 				for index in face_material_indices[0:-1]:
 					self.write(t + 2, "%d," % index)
 				else:

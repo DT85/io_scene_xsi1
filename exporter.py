@@ -3,7 +3,7 @@ from mathutils import Euler, Matrix, Vector
 from math import radians, degrees, pi
 from decimal import *
 
-from . import blend2xsi
+from . import xsi
 
 USE_FRAME_NAME_AS_MESH_NAME = True
 ALLOW_MESH_WITH_NO_FACES = False
@@ -14,28 +14,29 @@ KEYFRAME_PATHS = {"location", "rotation_euler", "rotation_quaternion", "scale"}
 ALLOWED_SUB_OBJECTS_GLOBAL = {"MESH", "EMPTY", "ARMATURE"}
 
 DEFAULT_MATERIAL = {
-	"diffuse": (blend2xsi.DEFAULT_DIFFUSE, tuple),
-	"hardness": (blend2xsi.DEFAULT_HARDNESS, float),
-	"specular": (blend2xsi.DEFAULT_SPECULAR, tuple),
-	"ambient": (blend2xsi.DEFAULT_AMBIENT, tuple),
-	"emissive": (blend2xsi.DEFAULT_EMISSIVE, tuple),
-	"shading_type": (blend2xsi.DEFAULT_SHADING_TYPE, int),
-	"texture": (blend2xsi.DEFAULT_TEXTURE, str),
-	"width": (blend2xsi.DEFAULT_WIDTH, int),
-	"height": (blend2xsi.DEFAULT_HEIGHT, int),
-	"material_name": (blend2xsi.DEFAULT_MATERIAL_NAME, str)
+	"diffuse": (xsi.DEFAULT_DIFFUSE, tuple),
+	"hardness": (xsi.DEFAULT_HARDNESS, float),
+	"specular": (xsi.DEFAULT_SPECULAR, tuple),
+	"ambient": (xsi.DEFAULT_AMBIENT, tuple),
+	"emissive": (xsi.DEFAULT_EMISSIVE, tuple),
+	"shading_type": (xsi.DEFAULT_SHADING_TYPE, int),
+	"texture": (xsi.DEFAULT_TEXTURE, str),
+	"width": (xsi.DEFAULT_WIDTH, int),
+	"height": (xsi.DEFAULT_HEIGHT, int),
+	"material_name": (xsi.DEFAULT_MATERIAL_NAME, str)
 }
 
-def center_mouse_in_window():
-	region = bpy.context.region
+# centers mouse cursor to the Blender window
+#def center_mouse_in_window():
+#	region = bpy.context.region
 	
-	window_cx = bpy.context.window.width // 2 + bpy.context.window.x
-	window_cy = bpy.context.window.height // 2 + bpy.context.window.y
+#	window_cx = bpy.context.window.width // 2 + bpy.context.window.x
+#	window_cy = bpy.context.window.height // 2 + bpy.context.window.y
 	
-	return bpy.context.window.cursor_warp(window_cx, window_cy)
+#	return bpy.context.window.cursor_warp(window_cx, window_cy)
 
 def ShowMessageBox(title_text="", message_text="", icon='INFO'):
-	center_mouse_in_window()
+	#center_mouse_in_window()
 	
 	def draw(self, context):
 		self.layout.separator()
@@ -48,9 +49,9 @@ def ShowMessageBox(title_text="", message_text="", icon='INFO'):
 
 # Mesh for hardpoint objects
 def generate_pointer_mesh(scale=0.05):
-	bz2mesh = blend2xsi.Mesh()
+	xsimesh = xsi.Mesh()
 	
-	bz2mesh.vertices = (
+	xsimesh.vertices = (
 		(-scale, -scale, 0.0),
 		(scale, -scale, 0.0),
 		(-scale, scale, 0.0),
@@ -58,24 +59,24 @@ def generate_pointer_mesh(scale=0.05):
 		(0.0, 0.0, 7.0 * scale)
 	)
 	
-	bz2mesh.normal_vertices = bz2mesh.vertices
-	bz2mesh.faces = ((0, 2, 3, 1), (3, 2, 4), (0, 1, 4), (1, 3, 4), (2, 0, 4))
-	bz2mesh.normal_faces = bz2mesh.faces
-	bz2mesh.face_materials = [blend2xsi.Material(diffuse=(1.0, 1.0, 1.0))] * len(bz2mesh.faces)
+	xsimesh.normal_vertices = xsimesh.vertices
+	xsimesh.faces = ((0, 2, 3, 1), (3, 2, 4), (0, 1, 4), (1, 3, 4), (2, 0, 4))
+	xsimesh.normal_faces = xsimesh.faces
+	xsimesh.face_materials = [xsi.Material(diffuse=(1.0, 1.0, 1.0))] * len(xsimesh.faces)
 	
-	return bz2mesh
+	return xsimesh
 
 def generate_bone_mesh(bone, posebone):
 	radius = bone.length*0.125
 	base = bone.length*0.20
 	tip = bone.length
 	
-	rgb = tuple(posebone.bone_group.colors.active)[0:3] if posebone.bone_group else blend2xsi.DEFAULT_DIFFUSE[0:3]
+	rgb = tuple(posebone.bone_group.colors.active)[0:3] if posebone.bone_group else xsi.DEFAULT_DIFFUSE[0:3]
 	rgba = rgb + (0.80,)
 	
-	bz2mesh = blend2xsi.Mesh()
+	xsimesh = xsi.Mesh()
 	
-	bz2mesh.vertices = (
+	xsimesh.vertices = (
 		(-radius, base, -radius),
 		(0.0, 0.0, 0.0),
 		(radius, base, -radius),
@@ -84,7 +85,7 @@ def generate_bone_mesh(bone, posebone):
 		(0.0, tip, 0.0)
 	)
 	
-	bz2mesh.faces = (
+	xsimesh.faces = (
 		(2, 4, 1),
 		(1, 3, 0),
 		(1, 4, 3),
@@ -95,9 +96,9 @@ def generate_bone_mesh(bone, posebone):
 		(5, 4, 2)
 	)
 	
-	bz2mesh.face_materials = [blend2xsi.Material(diffuse=rgba)] * len(bz2mesh.faces)
+	xsimesh.face_materials = [xsi.Material(diffuse=rgba)] * len(xsimesh.faces)
 	
-	bz2mesh.normal_vertices = (
+	xsimesh.normal_vertices = (
 		(0.8, -0.6, 0),
 		(0.8, -0.6, 0),
 		(0.8, -0.6, 0),
@@ -124,7 +125,7 @@ def generate_bone_mesh(bone, posebone):
 		(0.982872, 0.184289, 0)
 	)
 	
-	bz2mesh.normal_faces = (
+	xsimesh.normal_faces = (
 		(0, 1, 2),
 		(3, 4, 5),
 		(6, 7, 8),
@@ -135,7 +136,7 @@ def generate_bone_mesh(bone, posebone):
 		(21, 22, 23)
 	)
 	
-	return bz2mesh
+	return xsimesh
 
 def get_keyframes_filtered(action, keyframe_filter):
 	filtered_points = {key: [] for key in keyframe_filter}
@@ -199,7 +200,7 @@ def obj_hierarchy_to_linear(bpy_objects):
 class Save:
 	def __init__(self, operator, context, filepath="", **opt):
 		self.depsgraph = context.evaluated_depsgraph_get()
-		self.blend2xsi_xsi = blend2xsi.XSI()
+		self.xsi_xsi = xsi.XSI()
 		self.opt = opt
 		
 		original_keyframe_position = bpy.context.scene.frame_current
@@ -219,21 +220,21 @@ class Save:
 			print("XSI WARNING: Jedi Outcast/Jedi Academy do not support more than 1 root-level object:", ", ".join(obj.name for obj in objects))
 
 		self.referenced_objects = objects + list(obj_hierarchy_to_linear(objects))
-		self.enveloped_bz2frames = {}
-		self.bone_name_to_bz2frame = {}
+		self.enveloped_xsiframes = {}
+		self.bone_name_to_xsiframe = {}
 		
 		for obj in objects:
 			if obj.type in ALLOWED_SUB_OBJECTS_GLOBAL:
-				self.blend2xsi_xsi.frames += [self.object_to_bz2frame(obj, is_root_level=True)]
+				self.xsi_xsi.frames += [self.object_to_xsiframe(obj, is_root_level=True)]
 		
 		# Envelopes for bones
 		if opt["export_envelopes"]:
-			for bz2frame, obj in self.enveloped_bz2frames.items():
-				vertex_weights = get_vertex_weights(obj.evaluated_get(self.depsgraph), self.bone_name_to_bz2frame)
+			for xsiframe, obj in self.enveloped_xsiframes.items():
+				vertex_weights = get_vertex_weights(obj.evaluated_get(self.depsgraph), self.bone_name_to_xsiframe)
 				
-				for bone_name, bz2bone in self.bone_name_to_bz2frame.items():
+				for bone_name, xsibone in self.bone_name_to_xsiframe.items():
 					if bone_name in vertex_weights:
-						bz2frame.envelopes.append(blend2xsi.Envelope(bz2bone, vertex_weights[bone_name]))
+						xsiframe.envelopes.append(xsi.Envelope(xsibone, vertex_weights[bone_name]))
 					else:
 						print("XSI WARNING: (Skin envelopes) Vertex group not found for bone:", bone_name)
 		
@@ -241,7 +242,7 @@ class Save:
 		if bpy.context.scene.frame_current != original_keyframe_position:
 			bpy.context.scene.frame_set(original_keyframe_position)
 	
-	def material_to_bz2material(self, material):
+	def material_to_xsimaterial(self, material):
 		mat = {}
 		
 		# Check material's custom attributes, these can be used to explicitly override material settings
@@ -271,7 +272,7 @@ class Save:
 				else:
 					mat["texture"] = "noPic.pic"
 		
-		return blend2xsi.Material(
+		return xsi.Material(
 			mat["diffuse"],
 			mat["hardness"],
 			mat["specular"],
@@ -284,8 +285,8 @@ class Save:
 			mat["material_name"]
 		)
 
-	def matrix_to_bz2matrix(self, local_matrix):
-		return blend2xsi.Matrix(*list(tuple(row) for row in tuple(local_matrix.transposed())))
+	def matrix_to_xsimatrix(self, local_matrix):
+		return xsi.Matrix(*list(tuple(row) for row in tuple(local_matrix.transposed())))
 
 	def matrix_to_xsi(self, matrix):
         # change the matrix to 'xsi style'
@@ -311,9 +312,9 @@ class Save:
 		
 		matrix[3][0], matrix[3][1] = matrix[3][1], -matrix[3][0]
 	
-	def object_to_bz2frame(self, obj, is_root_level=False):
-		bz2frame = blend2xsi.Frame(obj.name)
-		bz2frame.mesh = None
+	def object_to_xsiframe(self, obj, is_root_level=False):
+		xsiframe = xsi.Frame(obj.name)
+		xsiframe.mesh = None
 		is_skinned = self.opt["export_envelopes"] and get_armature(obj) in self.referenced_objects
 		
 		# when we want to don't want to export meshes even though 
@@ -325,7 +326,7 @@ class Save:
 		
 		# 'zero out' the matrix for the scene root (usually 'model_root') object(s)
 		if is_root_level and self.opt["zero_root_transforms"]:
-			bz2frame.transform = self.matrix_to_bz2matrix(Matrix.Identity(4))
+			xsiframe.transform = self.matrix_to_xsimatrix(Matrix.Identity(4))
 		else:
 			if obj.parent is not None:
 				matrix_local_parent = Matrix()
@@ -353,22 +354,22 @@ class Save:
 			if self.opt["export_jedi"]:
 				# zero out the matrix for the 'mesh_root' / 'skeleton_root' objects
 				if obj.name == "mesh_root" or obj.name == "skeleton_root":
-					bz2frame.transform = self.matrix_to_bz2matrix(Matrix.Identity(4))
+					xsiframe.transform = self.matrix_to_xsimatrix(Matrix.Identity(4))
 				else:
 					# convert the matrix to 'xsi style'
 					self.matrix_to_xsi(mat_transform)
 					
-					# send the matrix to 'bz2xsi.py' for writing...
-					bz2frame.transform = self.matrix_to_bz2matrix(mat_transform)
+					# send the matrix to 'xsi.py' for writing...
+					xsiframe.transform = self.matrix_to_xsimatrix(mat_transform)
 			else:
 				# convert the matrix to 'xsi style'
 				self.matrix_to_xsi(mat_transform)
 				
-				bz2frame.transform = self.matrix_to_bz2matrix(mat_transform)
+				xsiframe.transform = self.matrix_to_xsimatrix(mat_transform)
 		
 		if is_skinned:
-			# just a copy of the 'FrameTransformMatrix'. send the matrix to 'bz2xsi.py' for writing...
-			bz2frame.pose = bz2frame.transform
+			# just a copy of the 'FrameTransformMatrix'. send the matrix to 'xsi.py' for writing...
+			xsiframe.pose = xsiframe.transform
 		
 		obj_eval = obj.evaluated_get(self.depsgraph)
 		data = obj_eval.data
@@ -384,7 +385,7 @@ class Save:
 			
 			else:
 				if self.opt["export_mesh"]:
-					bz2frame.mesh = self.mesh_to_bz2mesh(data, bz2frame.name if USE_FRAME_NAME_AS_MESH_NAME else None)
+					xsiframe.mesh = self.mesh_to_xsimesh(data, xsiframe.name if USE_FRAME_NAME_AS_MESH_NAME else None)
 					
 					if is_skinned:
 						# switch to armature REST position
@@ -394,55 +395,55 @@ class Save:
                         # ensure the we're setting the skin weights at frame 0.
 						bpy.context.scene.frame_set(bpy.context.scene.frame_start)
 						
-						self.enveloped_bz2frames[bz2frame] = obj_eval
+						self.enveloped_xsiframes[xsiframe] = obj_eval
 		
 		elif obj.type == "ARMATURE":
 			for bone, posebone in zip(obj_eval.data.bones, obj_eval.pose.bones):
 				if not bone.parent:
-					bz2frame.frames += [self.bone_to_bz2frame(bone, posebone, obj_eval)]
+					xsiframe.frames += [self.bone_to_xsiframe(bone, posebone, obj_eval)]
 		
 		# All other supported blender types are treated as empty objects by default below.
 		elif self.opt["generate_empty_mesh"]:
-			bz2frame.mesh = generate_pointer_mesh()
-			bz2frame.mesh.name = bz2frame.name
+			xsiframe.mesh = generate_pointer_mesh()
+			xsiframe.mesh.name = xsiframe.name
 		
 		if self.opt["export_animations"] and obj_eval.animation_data and obj_eval.animation_data.action:
-			bz2_animations = list(self.animation_to_bz2anim(obj_eval))
+			xsi_animations = list(self.animation_to_xsianim(obj_eval))
 			
 			if is_root_level and not ALLOW_ROOT_LEVEL_ANIMS:
-				bz2_animations = []
+				xsi_animations = []
 			
-			if bz2_animations:
+			if xsi_animations:
 				if is_root_level:
 					print("XSI WARNING: Root-level object %r has animation data, and may not behave as expected in Jedi Outcast/Jedi Academy." % obj.name)
 				
-				bz2frame.animation_keys += list(self.animation_to_bz2anim(obj_eval))
+				xsiframe.animation_keys += list(self.animation_to_xsianim(obj_eval))
 		
 		for obj in obj.children:
 			if obj.type in ALLOWED_SUB_OBJECTS:
-				bz2frame.frames += [self.object_to_bz2frame(obj)]
+				xsiframe.frames += [self.object_to_xsiframe(obj)]
 		
-		return bz2frame
+		return xsiframe
 	
-	def animation_to_bz2anim(self, obj):
+	def animation_to_xsianim(self, obj):
 		filtered_keyframes = get_keyframes_filtered(obj.animation_data.action, KEYFRAME_PATHS)
 		
-		# Convert the filtered keyframes to bz2 keyframe animations
+		# Convert the filtered keyframes to xsi keyframe animations
 		for key_type, points in filtered_keyframes.items():
 			if key_type == "scale":
-				bz2_keyframe_type = 1
+				xsi_keyframe_type = 1
 			elif key_type == "location":
-				bz2_keyframe_type = 2
+				xsi_keyframe_type = 2
 			else:
 				if self.opt["export_euler"]:
-					bz2_keyframe_type = 3
+					xsi_keyframe_type = 3
 				else:
-					bz2_keyframe_type = 0
+					xsi_keyframe_type = 0
             
 			if not points:
 				continue
 			
-			bz2anim = blend2xsi.AnimationKey(bz2_keyframe_type)
+			xsianim = xsi.AnimationKey(xsi_keyframe_type)
 			
 			for pos in range(bpy.context.scene.frame_start, bpy.context.scene.frame_end + 1):
 				bpy.context.scene.frame_set(pos)
@@ -452,22 +453,22 @@ class Save:
 				# convert the matrix to 'xsi style'
 				self.matrix_to_xsi(mat_obj)
 				
-				# send the keys to 'blend2xsi.py' for writing...
-				if bz2_keyframe_type == 0:
-					bz2anim.add_key(pos, tuple(mat_obj.transposed().to_quaternion()))
-				elif bz2_keyframe_type == 1:
-					bz2anim.add_key(pos, tuple(mat_obj.to_scale()))
-				elif bz2_keyframe_type == 2:
-					bz2anim.add_key(pos, tuple(mat_obj.to_translation()))
-				elif bz2_keyframe_type == 3:
-					bz2anim.add_key(pos, tuple([degrees(n) for n in mat_obj.to_euler()]))
+				# send the keys to 'xsi.py' for writing...
+				if xsi_keyframe_type == 0:
+					xsianim.add_key(pos, tuple(mat_obj.transposed().to_quaternion()))
+				elif xsi_keyframe_type == 1:
+					xsianim.add_key(pos, tuple(mat_obj.to_scale()))
+				elif xsi_keyframe_type == 2:
+					xsianim.add_key(pos, tuple(mat_obj.to_translation()))
+				elif xsi_keyframe_type == 3:
+					xsianim.add_key(pos, tuple([degrees(n) for n in mat_obj.to_euler()]))
 			
-			yield bz2anim
+			yield xsianim
 	
-	def bone_to_bz2frame(self, bone, posebone, armature):
-		bz2frame = blend2xsi.Frame(bone.name)
-		bz2frame.is_bone = True
-		self.bone_name_to_bz2frame[bone.name] = bz2frame
+	def bone_to_xsiframe(self, bone, posebone, armature):
+		xsiframe = xsi.Frame(bone.name)
+		xsiframe.is_bone = True
+		self.bone_name_to_xsiframe[bone.name] = xsiframe
 		
         # FrameTransformMatrix.
 		# root bones are in world co-ordinates, and the child bones are relative to the parent
@@ -505,51 +506,51 @@ class Save:
 		# convert the matrix to 'xsi style'
 		self.matrix_to_xsi(mat_transform)
 		
-		bz2frame.transform = self.matrix_to_bz2matrix(mat_transform)
+		xsiframe.transform = self.matrix_to_xsimatrix(mat_transform)
 		
 		# SI_FrameBasePoseMatrix
-        # just a copy of the 'FrameTransformMatrix'. send the matrix to 'bz2xsi.py' for writing...
-		bz2frame.pose = bz2frame.transform
+        # just a copy of the 'FrameTransformMatrix'. send the matrix to 'xsi.py' for writing...
+		xsiframe.pose = xsiframe.transform
 		
 		for child_bone, child_posebone in zip(bone.children, posebone.children):
-			bz2frame.frames += [self.bone_to_bz2frame(child_bone, child_posebone, armature)]
+			xsiframe.frames += [self.bone_to_xsiframe(child_bone, child_posebone, armature)]
 		
 		if self.opt["generate_bone_mesh"]:
-			bz2frame.mesh = generate_bone_mesh(bone, posebone)
-			bz2frame.mesh.name = bone.name
+			xsiframe.mesh = generate_bone_mesh(bone, posebone)
+			xsiframe.mesh.name = bone.name
 		
 		if self.opt["export_animations"]:
 			if armature.animation_data and armature.animation_data.action:
 				# Switch to armature POSE position
 				armature.data.pose_position = 'POSE'
 				
-				bz2frame.animation_keys += list(self.bone_animation_to_bz2anim(bone, posebone, armature))
+				xsiframe.animation_keys += list(self.bone_animation_to_xsianim(bone, posebone, armature))
 		
-		return bz2frame
+		return xsiframe
 	
-	def bone_animation_to_bz2anim(self, bone, posebone, armature):
+	def bone_animation_to_xsianim(self, bone, posebone, armature):
 		keyframe_filter = ["pose.bones[\"%s\"].%s" % (bone.name, path) for path in KEYFRAME_PATHS]
 		filtered_keyframes = get_keyframes_filtered(armature.animation_data.action, keyframe_filter)
 		
-		# convert the filtered keyframes to bz2 keyframe animations
+		# convert the filtered keyframes to xsi keyframe animations
 		location_path_name = "pose.bones[\"%s\"].location" % bone.name
 		scale_path_name = "pose.bones[\"%s\"].scale" % bone.name
         
 		for key_type, points in filtered_keyframes.items():
 			if key_type == scale_path_name:
-				bz2_keyframe_type = 1
+				xsi_keyframe_type = 1
 			elif key_type == location_path_name:
-				bz2_keyframe_type = 2
+				xsi_keyframe_type = 2
 			else:
 				if self.opt["export_euler"]:
-					bz2_keyframe_type = 3
+					xsi_keyframe_type = 3
 				else:
-					bz2_keyframe_type = 0
+					xsi_keyframe_type = 0
 			
 			if not points:
 				continue
 			
-			bz2anim = blend2xsi.AnimationKey(bz2_keyframe_type)
+			xsianim = xsi.AnimationKey(xsi_keyframe_type)
 			
 			for pos in range(bpy.context.scene.frame_start, bpy.context.scene.frame_end + 1):
 				bpy.context.scene.frame_set(pos)
@@ -588,28 +589,28 @@ class Save:
 				# convert the matrix to 'xsi style'
 				self.matrix_to_xsi(mat_posebone)
 				
-				# send the keys to 'blend2xsi.py' for writing...
-				if bz2_keyframe_type == 0:
-					bz2anim.add_key(pos, tuple(mat_posebone.transposed().to_quaternion()))
+				# send the keys to 'xsi.py' for writing...
+				if xsi_keyframe_type == 0:
+					xsianim.add_key(pos, tuple(mat_posebone.transposed().to_quaternion()))
 				# don't need to write scale keys...
-				#elif bz2_keyframe_type == 1:
-				#	bz2anim.add_key(pos, tuple(mat_posebone.to_scale()))
-				elif bz2_keyframe_type == 2:
-					bz2anim.add_key(pos, tuple(mat_posebone.to_translation()))
+				#elif xsi_keyframe_type == 1:
+				#	xsianim.add_key(pos, tuple(mat_posebone.to_scale()))
+				elif xsi_keyframe_type == 2:
+					xsianim.add_key(pos, tuple(mat_posebone.to_translation()))
 				
-				elif bz2_keyframe_type == 3:
-					bz2anim.add_key(pos, tuple([degrees(n) for n in mat_posebone.to_euler()]))
+				elif xsi_keyframe_type == 3:
+					xsianim.add_key(pos, tuple([degrees(n) for n in mat_posebone.to_euler()]))
 			
-			yield bz2anim
+			yield xsianim
 	
-	def mesh_to_bz2mesh(self, data, name=None):
-		bz2mesh = blend2xsi.Mesh(name if name else data.name)
+	def mesh_to_xsimesh(self, data, name=None):
+		xsimesh = xsi.Mesh(name if name else data.name)
 		
-		bz2materials = []
+		xsimaterials = []
 		
 		if self.opt["export_mesh_materials"]:
 			for material in data.materials:
-				bz2materials += [self.material_to_bz2material(material)]
+				xsimaterials += [self.material_to_xsimaterial(material)]
 		
 		for vertex in data.vertices:
 			# change the vertex positions to 'xsi style'
@@ -617,20 +618,20 @@ class Save:
 			vertex.co.y = vertex.co.z
 			vertex.co.z = vert_Y
 			
-			bz2mesh.vertices += [tuple(vertex.co.xyz)]				
+			xsimesh.vertices += [tuple(vertex.co.xyz)]				
                 
 		
 		for polygon in data.polygons:
-			bz2mesh.faces += [tuple(polygon.vertices)]
+			xsimesh.faces += [tuple(polygon.vertices)]
 		
-		if bz2materials:
+		if xsimaterials:
 			for polygon in data.polygons:
-				bz2mesh.face_materials += [bz2materials[polygon.material_index]]
+				xsimesh.face_materials += [xsimaterials[polygon.material_index]]
 		
 		elif not ALLOW_MESH_WITH_NO_MATERIAL:
 			print("XSI WARNING: Mesh %r doesn't have any materials, adding a default material instead." % name)
 			
-			bz2mesh.face_materials = [blend2xsi.Material()] # Default material
+			xsimesh.face_materials = [xsi.Material()] # Default material
 		
 		active_uv_layer = data.uv_layers.active
 		uv_layer = active_uv_layer.data if active_uv_layer else None
@@ -640,27 +641,27 @@ class Save:
 		# Normals and mesh loop faces (loop indices shared for uv and vert colors)
 		for polygon in data.polygons:
 			for loop_index in polygon.loop_indices:
-				bz2mesh.normal_vertices += [tuple(data.loops[loop_index].normal)]
+				xsimesh.normal_vertices += [tuple(data.loops[loop_index].normal)]
 			
-			bz2mesh.normal_faces += [tuple(polygon.loop_indices)]
+			xsimesh.normal_faces += [tuple(polygon.loop_indices)]
 		
 		if uv_layer and self.opt["export_mesh_uvmap"]:
 			for poly in data.polygons:
 				for loop_index in poly.loop_indices:
-					bz2mesh.uv_vertices += [tuple(uv_layer[loop_index].uv)]
+					xsimesh.uv_vertices += [tuple(uv_layer[loop_index].uv)]
 			
-			bz2mesh.uv_faces = bz2mesh.normal_faces
+			xsimesh.uv_faces = xsimesh.normal_faces
 		
 		if color_layer and self.opt["export_mesh_vertcolor"]:
 			for poly in data.polygons:
 				for loop_index in poly.loop_indices:
-					bz2mesh.vertex_colors += [tuple(color_layer[loop_index].color)]
+					xsimesh.vertex_colors += [tuple(color_layer[loop_index].color)]
 			
-			bz2mesh.vertex_color_faces = bz2mesh.normal_faces
+			xsimesh.vertex_color_faces = xsimesh.normal_faces
 		
-		return bz2mesh
+		return xsimesh
 
 def save(operator, context, filepath="", **opt):
-	Save(operator, context, filepath=filepath, **opt).blend2xsi_xsi.write(filepath=filepath)
+	Save(operator, context, filepath=filepath, **opt).xsi_xsi.write(filepath=filepath)
 	ShowMessageBox("Softimage XSI Exporter", "Exported successfully!", 'CHECKMARK')
 	return {"FINISHED"}
