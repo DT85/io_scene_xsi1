@@ -56,13 +56,13 @@ class ExportXSI(bpy.types.Operator, ExportHelper):
 	)
 	
 	export_mesh: BoolProperty(
-		name="Export Mesh",
+		name="Export Meshes",
 		description="Export mesh data",
 		default=True
 	)
     
 	export_mesh_uvmap: BoolProperty(
-		name="UV Map",
+		name="UV Coordinates",
 		description="Export mesh UV map coordinates",
 		default=True
 	)
@@ -87,7 +87,13 @@ class ExportXSI(bpy.types.Operator, ExportHelper):
 	
 	export_jedi: BoolProperty(
 		name="Export For Jedi Outcast/Academy",
-		description="Export for Jedi Outcast/Academy",
+		description="Export for Jedi Outcast/Academy (for use with GLA importer skeleton)",
+		default=True
+	)
+	
+	export_gla_imp_skele: BoolProperty(
+		name="Using GLA Imported Skeleton",
+		description="Project is using the GLA imported skeleton, from the Jedi Academy Blender Tools",
 		default=True
 	)
 	
@@ -179,6 +185,10 @@ class ExportXSI(bpy.types.Operator, ExportHelper):
 		
 		jedi_sub = jedi_layout.column()
 		jedi_sub.prop(self, "export_facefix", icon="MESH_MONKEY")
+		jedi_sub.enabled = self.export_jedi
+		
+		jedi_sub = jedi_layout.column()
+		jedi_sub.prop(self, "export_gla_imp_skele", icon="GROUP_BONE")        
 		jedi_sub.enabled = self.export_jedi
 		layout.separator()
 		
