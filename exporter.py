@@ -335,7 +335,7 @@ class Save:
 				matrix_local = Matrix()
 				matrix_local @= Matrix(obj.matrix_local)
 				
-				if self.opt["export_jedi"]:
+				if self.opt["export_jedi"] and self.opt["export_gla_imp_skele"]:
 					# change the 'front' from Y+ to X+
 					self.bone_mat_front_Y_to_X(matrix_local_parent)
 					self.bone_mat_front_Y_to_X(matrix_local)
@@ -345,7 +345,7 @@ class Save:
 				matrix_local = Matrix()
 				matrix_local @= Matrix(obj.matrix_local)
 				
-				if self.opt["export_jedi"]:
+				if self.opt["export_jedi"] and self.opt["export_gla_imp_skele"]:
 					# change the 'front' from Y+ to X+
 					self.bone_mat_front_Y_to_X(matrix_local)
 				
@@ -479,7 +479,7 @@ class Save:
 			matrix_local = Matrix()
 			matrix_local @= Matrix(bone.matrix_local)
             
-			if self.opt["export_jedi"]:
+			if self.opt["export_jedi"] and self.opt["export_gla_imp_skele"]:
 				# change the 'front' from Y+ to X+
 				self.bone_mat_front_Y_to_X(matrix_local_parent)
 				self.bone_mat_front_Y_to_X(matrix_local)
@@ -497,7 +497,7 @@ class Save:
 			matrix_local = Matrix()
 			matrix_local @= Matrix(bone.matrix_local)
 			
-			if self.opt["export_jedi"]:
+			if self.opt["export_jedi"] and self.opt["export_gla_imp_skele"]:
 				# change the 'front' from Y+ to X+
 				self.bone_mat_front_Y_to_X(matrix_local)
 			
@@ -562,7 +562,7 @@ class Save:
 					matrix_local = Matrix()
 					matrix_local @= Matrix(posebone.matrix)
                     
-					if self.opt["export_jedi"]:
+					if self.opt["export_jedi"] and self.opt["export_gla_imp_skele"]:
 						# change the 'front' from Y+ to X+
 						self.bone_mat_front_Y_to_X(matrix_local_parent)
 						self.bone_mat_front_Y_to_X(matrix_local)
@@ -580,7 +580,7 @@ class Save:
 					matrix_local = Matrix()
 					matrix_local @= Matrix(posebone.matrix)
 					
-					if self.opt["export_jedi"]:
+					if self.opt["export_jedi"] and self.opt["export_gla_imp_skele"]:
 						# change the 'front' from Y+ to X+
 						self.bone_mat_front_Y_to_X(matrix_local)
 					
@@ -592,12 +592,10 @@ class Save:
 				# send the keys to 'xsi.py' for writing...
 				if xsi_keyframe_type == 0:
 					xsianim.add_key(pos, tuple(mat_posebone.transposed().to_quaternion()))
-				# don't need to write scale keys...
-				#elif xsi_keyframe_type == 1:
-				#	xsianim.add_key(pos, tuple(mat_posebone.to_scale()))
+				elif xsi_keyframe_type == 1:
+					xsianim.add_key(pos, tuple(mat_posebone.to_scale()))
 				elif xsi_keyframe_type == 2:
-					xsianim.add_key(pos, tuple(mat_posebone.to_translation()))
-				
+					xsianim.add_key(pos, tuple(mat_posebone.to_translation()))				
 				elif xsi_keyframe_type == 3:
 					xsianim.add_key(pos, tuple([degrees(n) for n in mat_posebone.to_euler()]))
 			
